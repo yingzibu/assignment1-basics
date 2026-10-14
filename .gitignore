@@ -210,3 +210,13 @@ __pycache__/
 *.npz
 *.pkl
 *.prof
+
+data/
+artifacts/
+.venv/
+__pycache__/
+*.pyc
+*.npy
+*.npz
+*.pkl
+*.prof
