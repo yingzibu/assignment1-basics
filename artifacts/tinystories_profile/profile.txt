@@ -1,0 +1,28 @@
+         1655113931 function calls (1655113906 primitive calls) in 1382.289 seconds
+
+   Ordered by: cumulative time
+   List reduced from 94 to 20 due to restriction <20>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.069    0.069 1382.289 1382.289 train_bpe.py:200(train_bpe)
+        1   11.921   11.921 1368.448 1368.448 train_bpe.py:36(_count_pretokens)
+  2717700    5.816    0.000 1354.300    0.000 train_bpe.py:55(count_segment)
+  3333195    4.130    0.000 1345.588    0.000 __init__.py:676(update)
+  3333193  269.058    0.000 1334.963    0.000 {built-in method _collections._count_elements}
+539309868  772.432    0.000 1065.906    0.000 train_bpe.py:57(<genexpr>)
+536592171  157.638    0.000  157.638    0.000 {method 'encode' of 'str' objects}
+536592168  135.836    0.000  135.836    0.000 {method 'group' of '_regex.Match' objects}
+        1    5.852    5.852   13.772   13.772 train_bpe.py:107(_train_from_counts)
+  3333221    2.685    0.000    6.495    0.000 {built-in method builtins.isinstance}
+  3333193    1.655    0.000    3.810    0.000 <frozen abc>:117(__instancecheck__)
+   615495    0.919    0.000    3.123    0.000 __init__.py:602(__init__)
+  2717700    2.614    0.000    2.614    0.000 {method 'decode' of 'bytes' objects}
+   277780    1.657    0.000    2.558    0.000 train_bpe.py:81(_merge_word)
+  2717700    2.486    0.000    2.486    0.000 {method 'finditer' of '_regex.Pattern' objects}
+  3333193    2.155    0.000    2.155    0.000 {built-in method _abc._abc_instancecheck}
+  2717699    1.120    0.000    1.120    0.000 {method 'end' of 're.Match' objects}
+  2717699    1.029    0.000    1.029    0.000 {method 'start' of 're.Match' objects}
+  1787623    0.651    0.000    0.651    0.000 {method 'add' of 'set' objects}
+3068896/3068895    0.557    0.000    0.557    0.000 {built-in method builtins.len}
+
+
