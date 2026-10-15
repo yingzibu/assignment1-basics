@@ -164,6 +164,7 @@ def run_training(config, train_data, val_data, checkpoint=None):
     from .cross_entropy import cross_entropy
     from .data_loading import get_batch
     from .gradient_clipping import gradient_clipping
+    from .experiment_log import ExperimentLogger
     from .learning_rate_schedule import get_lr_cosine_schedule
     from .transformer_lm import TransformerLM
 
@@ -187,11 +188,13 @@ def run_training(config, train_data, val_data, checkpoint=None):
     )
     resuming = checkpoint is not None
     completed_steps = 0
+    resume_elapsed_seconds = 0.0
     best_val_loss = None
     if checkpoint is not None:
         model.load_state_dict(checkpoint["model_state_dict"])
         optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
         completed_steps = int(checkpoint["iteration"])
+        resume_elapsed_seconds = float(checkpoint.get("elapsed_seconds", 0.0))
         best_val_loss = checkpoint.get("best_val_loss")
         if "numpy_rng_state" in checkpoint:
             state = checkpoint["numpy_rng_state"]
@@ -215,7 +218,6 @@ def run_training(config, train_data, val_data, checkpoint=None):
     if (out_dir / "latest.pt").exists() and not resuming:
         raise FileExistsError(f"{out_dir}/latest.pt exists; use --resume or a new --out-dir")
     out_dir.mkdir(parents=True, exist_ok=True)
-    (out_dir / "config.json").write_text(json.dumps(config, indent=2) + "\n", encoding="utf-8")
     print(
         f"device={device} parameters={sum(p.numel() for p in model.parameters()):,} "
         f"effective_batch_size={config['batch_size'] * config['grad_accum_steps']} "
@@ -250,6 +252,7 @@ def run_training(config, train_data, val_data, checkpoint=None):
             "model_state_dict": model.state_dict(),
             "optimizer_state_dict": optimizer.state_dict(),
             "iteration": completed_steps,
+            "elapsed_seconds": logger.elapsed_seconds,
             "config": config.copy(),
             "best_val_loss": best_val_loss,
             "numpy_rng_state": (
@@ -271,11 +274,14 @@ def run_training(config, train_data, val_data, checkpoint=None):
     last_log_step = completed_steps
     log_started = time.perf_counter()
     loss_sum = 0.0
-    with (out_dir / "metrics.jsonl").open("a", encoding="utf-8") as log:
+    with ExperimentLogger(
+        out_dir, config,
+        resume_step=completed_steps if resuming else None,
+        elapsed_seconds=resume_elapsed_seconds,
+    ) as logger:
         def emit(record):
-            log.write(json.dumps(record) + "\n")
-            log.flush()
-            print(json.dumps(record), flush=True)
+            logged = logger.log(**record)
+            print(json.dumps(logged), flush=True)
 
         for it in range(completed_steps, config["max_steps"]):
             lr = get_lr_cosine_schedule(
